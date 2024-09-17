@@ -1,0 +1,301 @@
+This is social Media API. This will guide through all the requests.
+
+Note: Update env variables when you want to use this API. for DB_URL, provide your own system's mongo db URL. Changing JWT_SECRET is optional.
+
+1. User authentication.
+    a.Signup: (post):http://localhost:3200/api/users/signup  
+        example: 
+            {
+                "name":"Meghana",
+                "email": "Mehetaa@gmail.com",
+                "password": "Feb2024$",
+                "age":18,
+                "gender":"male"
+                "avatar":"any imageURL of your desire"
+            }
+
+        For avatar, you can load from your machine in form data in body section, put key as 'avatar'.
+
+    b.Signin:(post): http://localhost:3200/api/users/Signin
+        example:
+            {
+                "email":"sankalpchoubey10@gmail.com",
+                "password":"Shinobi24#"
+            }
+
+        This will return an authentication token, use this token for all other API(except for password reset) in headers section. Put key as authorization and paste token in value.
+        This token will determine the userID, so no need to pass userID seperately in any routes.  
+
+    c.Signout(delete): http://localhost:3200/api/users/logout
+        Paste token in authorization headers. Only then this will work.
+
+    d.Signout of all devices(delete): http://localhost:3200/api/users/logout-all-devices
+        Use in similar way as Signout. 
+
+    e.Get specific user details(get): http://localhost:3200/api/users/get-details/:userID
+        example: http://localhost:3200/api/users/get-details/66327c538702be5b09d7521f
+        this will return user details in below format.
+        {
+            "_id": "66327c538702be5b09d7521f",
+            "name": "Sankalp",
+            "email": "manbey10@gmail.com",
+            "age": null,
+            "gender": null,
+            "avatar": null
+        }
+
+        Note: use token in authorization headers.
+
+    f. Get all user details(get): http://localhost:3200/api/users/get-all-details
+        this will return details of all users which are signed up. Format will be similar to the above. 
+
+        Note: use token in authorization headers.
+    
+    g. Update user details(post): http://localhost:3200/api/users/update-details
+        Provide details as signup section, for updating image, provide in form-data in body section, for image, provide key as 'avatar'.
+        This will give error if email and password are provided in body. This will not update these 2 fields. 
+
+        Note: use token in authorization headers.
+
+2. Post related routes.
+    a. Retrive all posts from various users(get): http://localhost:3200/api/posts/all
+        This will load all the posts present in database.
+        example: 
+        [
+            {
+                "_id": "663348c4742fb6df59def179",
+                "userID": "66327ce38702be5b09d75220",
+                "caption": "Argentina",
+                "imageURL": "Messi",
+                "likes": [
+                    {
+                        "userID": "66327ce38702be5b09d75220"
+                    },
+                    {
+                        "userID": "66334998742fb6df59def17b"
+                    }
+                ]
+            },
+            {
+                "_id": "6633c05d05598f26014e42a6",
+                "userID": "66334998742fb6df59def17b",
+                "caption": "Win next fifa",
+                "imageURL": "Ronaldo"
+            }
+        ]
+
+        Note: use token in authorization headers.
+
+    b. Retrive specific Posts by ID(get): http://localhost:3200/api/posts/:postID
+        example: http://localhost:3200/api/posts/663348c4742fb6df59def179
+        The above will return the post if it is present.
+        output:
+        {
+            "_id": "663348c4742fb6df59def179",
+            "userID": "66327ce38702be5b09d75220",
+            "caption": "Argentina",
+            "imageURL": "Messi",
+            "likes": [
+                {
+                    "userID": "66327ce38702be5b09d75220"
+                },
+                {
+                    "userID": "66334998742fb6df59def17b"
+                }
+            ]
+        }
+
+        Note: use token in authorization headers.
+
+    c. Retrive all posts for specific user(get): http://localhost:3200/api/posts/users/:userID
+        example: http://localhost:3200/api/posts/users/66334998742fb6df59def17b
+
+        This will return all posts by a particular user. 
+        Output format will be same as 2.a part. 
+
+        Note: use token in authorization headers.
+
+    d.  Create post(post): http://localhost:3200/api/posts/
+        In request body, provide it caption and imageURL. If uploading image from system, use form-data in body. For image, use key as 'imageURL'.
+        if using JSON, you can use it in below format:
+        {
+            "caption": "most",
+            "imageURL": "2024-05-11T14_52_55.239ZTGIF Circle Palm Trees Social Media Graphic  (2).png"
+        }
+
+        Note: use token in authorization headers.
+
+    e. Delete a specific post(delete): http://localhost:3200/api/posts/:postID
+        example: http://localhost:3200/api/posts/663f86475cea5c52b7dd6a7d
+        This will delete the post if this belongs to the userID who is using this route. It will not delete if the post belongs to some other userID
+
+        Note: use token in authorization headers
+    
+    f. Update specific post(put): http://localhost:3200/api/posts/update
+        pass id, imageURL and caption in req body. For image, you can use form-data. Provide key as 'imageURL'
+        example on how to pass in request body
+        {
+            "caption":"dumb",
+            "imageURL":"no image",
+            "id":"663f597aa9a8736bdb395526"
+        }
+
+        This will only update if postID belongs to the userID passed through the token. 
+
+        Note: use token in authorization headers
+
+3. Comments
+    a. Get comments for specific post(get): http://localhost:3200/api/comments/:postID
+        example: http://localhost:3200/api/comments/663348c4742fb6df59def179
+
+        It will return all comment data for the postID(like _id,userID,postID,likes,userID's of who has liked the comment)
+
+        Note: use token in authorization headers
+
+    b. Add comment to specific post(post): http://localhost:3200/api/comments/:postID
+        example: http://localhost:3200/api/comments/66360c5ed9494cc2143982db
+        req body example below:
+        {
+            "comment":"whatever you want to comment"
+        }
+
+        Note: use token in authorization headers
+    
+    c. delete specific comment(delete): http://localhost:3200/api/comments/:commentID
+        example: http://localhost:3200/api/comments/66360c5ed9494cc2143982db
+
+        it will delete if
+        1. commentID belongs to the userID or
+        2. post belongs to the userID
+
+        In all other cases, this will not delete the comment
+
+        Note: use token in authorization headers
+
+    d. update specific comment(put): http://localhost:3200/api/comments/:commentID
+        example: http://localhost:3200/api/comments/66360c5ed9494cc2143982db
+        it will update if commentID belongs to the userID.
+
+        pass comment in req body
+
+        {
+            "comment":"whatever you want to comment"
+        }
+
+        Note: use token in authorization headers
+
+4. Likes
+    a. Get Likes(get): http://localhost:3200/api/likes/:ID
+        example: http://localhost:3200/api/likes/663348c4742fb6df59def179
+        In id, you can pass postID or commentID. It will return the number of likes on that post or comment
+
+        Note: use token in authorization headers
+
+    b. toggle like on post or comment(post): http://localhost:3200/api/likes/:ID
+        example: http://localhost:3200/api/likes/663348c4742fb6df59def179
+
+        In this, pass postID or commentID, it will either liked the post, or disliked the post depending on whether you've already liked the post or not.
+        Will not work if ID is invalid
+
+        Outputs: Liked the post || Like removed from the post
+
+        Note: use token in authorization headers'
+
+5. FriendList
+    a. Get User's FriendList(get): http://localhost:3200/api/friends/get-friends
+        This returns all friend of the user. It won't return any pending status for friend requests
+
+        return example: 
+        [
+            {
+                "userID": "663a10df0339f2ebf789deea",
+                "status": "friends"
+            },
+            {
+                "userID": "663ba6066bcd8588481ba470",
+                "status": "friends"
+            }
+        ]
+
+        Note: use token in authorization headers'
+
+    b. Get Pending friend request(get): http://localhost:3200/api/friends/get-pending-requests
+        This returns all pending friend requests. Even if you've sent the request, and request acceptance or rejection is pending for other friend, it will return those requests also.
+
+        return example: 
+        [
+            {
+                "userID": "663ba6066bcd8588481ba470",
+                "status": "friend request pending"
+            }
+        ]
+
+        or 
+
+        [
+            {
+                "userID": "663ba6066bcd8588481ba470",
+                "status": "friend request sent"
+            }
+        ]
+
+        Note: use token in authorization headers'
+
+    c. Send friend request or cancel it(post): http://localhost:3200/api/friends/toggle-friendship/:friendId
+        example: http://localhost:3200/api/friends/toggle-friendship/663a109f0339f2ebf789dee8
+        
+        This will send a friend request to the userID. If request is already sent, it will remove request. This can even unfriend if friendship status is "friends". 
+        If you put your own userID, this will not work. You will receive appropriate response. 
+
+        Note: use token in authorization headers
+
+    d. Accept or reject friend request(post): http://localhost:3200/api/friends/response-to-request/:friendId
+        example: http://localhost:3200/api/friends/response-to-request/663a10df0339f2ebf789deea
+
+        how to send req body:
+        {
+            "action":"yes"
+        }
+
+        Action field needs to be yes or no. 
+        It will search for friend with the id provided. It will take action only if request is pending. If user is the one who had sent this request, this won't work. 
+
+        Note: use token in authorization headers
+
+6. Password Reset(doens't require authorization header)
+    a. Send OTP(post): http://localhost:3200/api/otp/send
+        in request body, provide email
+        {
+            "email":"sankalpchoubey10@gmail.com"
+        }
+
+        Make sure you send a valid email, and it has to be signed up. Or it won't work
+
+
+    b. Verify OTP(get): http://localhost:3200/api/otp/verify
+        in request body, pass otp and email
+        {
+            "email":"sankalpchoubey10@gmail.com",
+            "otp": 591316
+        }
+
+        Make sure, the otp is same as the one sent in mail. 
+
+    c. Reset password(post): http://localhost:3200/api/otp/reset-password
+        in request body, pass email and new password
+        {
+            "email":"sankalpchoubey10@gmail.com",
+            "password":"Avatar23#"
+        }
+
+        This will change the password if otp is verified. If not verified, this will fail. To test password change, try login using new password.
+
+
+    
+
+
+
+
+
+
+
